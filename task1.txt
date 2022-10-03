@@ -1,0 +1,46 @@
+1. What is the purpose of this code? What does the code compute to get it?*
+
+The purpose of this code is to solve a set of linear equations such as AX=B knowing that A is a
+squared matrix, B and X are sized N x NRHS.
+Moreover in this code we noticed that the matrix generated are squared then this code can solve
+more than that strict requirement implemented in this code (can solve with N x NHRS size).
+The code is using the LAPACK package which is a famous module for linear algebra witch is containing the algorithm of PLU factorization of the Matrix A. The result of the computing program is stored in the matrix B or even bref.
+
+2. Briefly describe alternative mathematical methods to perform the same operation.
+
+We will describe differents methods than can be used to solve this problem :
+
+- Gauss Method : There exists M invertible such that T = M with A triangular superior.The next
+step is to resolve Tx = Mb where M will not be computed explicitly but Mb obtained as we construct T.
+
+- Gauss Jordan elimination: The main goal is to use the process of row redution by computing some elementary rows operations. Firstly we must reduce the system to row row echelon form and then we can have a look and see the status of the system : if it admits one, none or several solutions. 
+After that we compute the back substitution by still using rows operations until the solution is found. 
+- QR decomposition: A is decomposed as the product of 2 matrix. O which is orthogonal and R
+wich is upper triangular matrix. So the problem becomes QRX=B.
+Then the hard task would be to find O and R decomposition values in order to achieve the suit of
+the OR factorization method.
+
+- Cholesky decomposition: if A is symetric and positive it is possible to find a lower
+triangular matrix L such that A=LxL* where L* is the matrix L transposed.
+
+- Jacobi: We decompose the matrix A as follows: A= D-E-F with D the diagonal matrix of A. -E the lower triangular matrix of A with zero diagonal and -F the upper triangular matrix with zero
+diagonal. In the Jacobi method, we chose M-D and N-E+F
+
+- Singular value decomposition: The Singular Value Decomposition (SVD) expresses the matrix A
+as : A = USV* with U an m x n colum orthogonal matrix, S an n x x diagonal matrix with positive or zero elements and V an n x x orthogonal matrix. 
+The SVD always exists and provides a solution as long as the data vector is not in the null space.
+
+
+3. What alternative(s) do you think is more demanding, from a computational point of view and in
+terms of memory consumption?
+
+Gauss is o(n³), QR is o(4/3n³), Cholesky is o(n³), SVD is o(NxNRHSxMin(N,NRHS)), Jacobi method is o(n³) but can be executed in o(n²) if the matrix A is sparsed. So QR is the more demanding in terms of comutational cost ( in the worst case ). From a memory point of view the SVD method is very consummer because we have to initialize many matrix in order to compute the decomposition. Then the Gauss Jordan Method or Jacobi requires less matrix storage. In fact only 5 Matrix are needed for the last computing during the execution time of the iterations.
+
+4. What do you think can be the best candidate(s) for a parallel implementation?
+
+We think that the best candidate for us is the Jacobi because it is an iterative method. Then it will be pretty easy to parallelize the loops knowing that there isn't any depedencies between the steps. 
+ps : note that we have tried to implement this method but It didn't work well. In fact we didn't find any convergence. So If you can have a look it could be very nice because we may not have noticed an error in our implementation. ( Gauss Jordan has been implemented instead) 
+
+5. Choose one of the described methods to code your own sequential implementation in C, using the provided code skeleton.
+
+Then we chose the Gauss Jordan Method that for doing the sequential implementation in C knowing that we would have to optimize it . 
