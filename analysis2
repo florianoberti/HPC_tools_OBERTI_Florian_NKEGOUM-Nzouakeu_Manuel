@@ -1,0 +1,15 @@
+-Valgrind memcheck :
+	valgrind --leak-check=full ./monprog 1024
+	First valgrind produced a report and as we can see our implementations had many memory leaks due to the fact that we didn't freed the memeory at the end of the implementation.We corrected that and ran another analysis with valgrind and got 0 memory leak.However we note that 8 bytes are still reachable due to the fact that some blocks were not freed, but they could have been freed  because the program still was keeping track of pointers to those memory blocks.There is normally no potential for heap exhaustion from "still reachable" blocks. This is because these blocks are one-time allocations, references to which are kept throughout the duration of the process's lifetime.
+	
+-Parallelisation: #pragma omp for and execute with 4-64 threads .
+
+
+-Vtune amplifier (done already last time :))
+	Through Vtune we can see that the loop inside the Gauss-Jordan subroutine which his the function which has the most computational time(95%).AS this loop carries dependencies so it cannot be parallelized properly.This is why There was not much improvement with openmp.
+	
+-Intel Advisor : (done already last time :))
+ 	Intel advisor is recommending to use the smallest datatype for our implementation.As we used Double we should probably use floats though we can lose in precision when dealing with large number.However to compare the results of our implementation with those of lapacke we must keep the type double.
+ 	We are also recommended to force compiler to align loops in the routine mydgesv so we put a ##pragma code_align(16) so that he loop is aligned on a 16 byte boundary.
+ 	
+

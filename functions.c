@@ -1,4 +1,5 @@
 #include "functions.h"
+#include<omp.h>
 int maxi(int a,int b)
 {
   if(a>b) return a;
@@ -8,8 +9,7 @@ int maxi(int a,int b)
 void check_matrix(double *mat, int n,int nrhs, int *flag)
 {
     int i, j;
-    float sum;
-     
+    double sum; 
     // flag == 2 for infinite solution
     // flag == 3 for No solution
     *flag = 2;
@@ -25,6 +25,7 @@ void check_matrix(double *mat, int n,int nrhs, int *flag)
 void swap(double *mat, int row1, int row2,int n, int m)
 {
   int max_dim = maxi(n,m);
+  #pragma omp parallel for
     for (int i = 0; i < m; i++)
     {
         int temp = mat[row1*max_dim+i];
@@ -36,29 +37,13 @@ void augmenter_matrix(double *mat ,double *a,double *b,int n,int nrhs)
 {
     int i,j;
     int ldb = maxi(n,nrhs);
-    double A[n][n], B[n][nrhs],C[n][n+nrhs];
-    for(i=0;i<n;i++)
-      for(j=0;j<n;j++)
-        A[i][j]=a[i*n+j];
-
-    for(i=0;i<n;i++){
-      for(j=0;j<nrhs;j++){
-        B[i][j]=b[i*ldb+j];
-        
-      }
-        }
-        // merge A and B
-    for(int i = 0; i < n; i++)
-    {
-       for(int j = 0; j < n+nrhs; j++)
-       {
-        if(j<n) C[i][j] = A[i][j];
-        else C[i][j] = B[i][j-n]; 
-       }
-    }
+    #pragma omp parallel for private(j)
     for(i=0;i<n;i++){
       for(j=0;j<n+nrhs;j++){
-        mat[i*(n+nrhs)+j]= C[i][j]; }  }
+        if(j<n) mat[i*(n+nrhs)+j]= a[i*n+j]; 
+        else mat[i*(n+nrhs)+j] = b[i*ldb+(j-n)];
+        }  
+        }
    
 }
 
@@ -82,10 +67,12 @@ void Gauss_jordan(double *mat,int n ,int m, int *flag)
         for(j=0;j<n;j++){
           if(i!=j){
             norm = mat[j*max_dim+i]/mat[i*(max_dim+1)];
+            //#pragma omp parallel for
             for(k=0;k<m;k++){
                 mat[j*max_dim+k]-=norm*mat[i*max_dim+k];
             }
-        }
+      
         }
     }
+}
 }
